@@ -116,5 +116,23 @@ shinyServer(function(input, output) {
     PlotN0S0(results()$N0S0)
   })
   
+	
+	
+	
+	plotByBroodYear_results <- reactive({
+		plots <- plotByBroodYear(results(),3,3)		# nr and nc could be inputs; leave constant for now
+		n <- length(plots)
+		list(plots=plots, n=n)
+	})
+
+  output$plots_nByBroodYear <- renderUI({
+    lapply(1:plotByBroodYear_results()$n, function(i) {
+				renderPlot({
+					plotByBroodYear_results()$plots[[i]]
+				})			
+    })
+  })	
+	
+	
 })
 # end shinyServer

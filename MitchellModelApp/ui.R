@@ -6,7 +6,7 @@
 # ui is a work in progress as we make additional changes to the model
 
 # create variables for choices of some selectInputs
-gm_choices <- c("", "VB.Normal", "VB.LogNormal",
+gm_choices <- c("None", "VB.Normal", "VB.LogNormal",
                 "Gompertz.Normal", "Gompertz.LogNormal")
 
 data_choices <- c("Tagging", "Card")#, "Both",
@@ -29,7 +29,7 @@ shinyUI(fluidPage(
     sidebarPanel(
       
       fluidRow(
-        column(width = 3,
+        column(width = 12,
                # data source
                selectInput(
                  "data_source", label = "Data source:",
@@ -40,19 +40,19 @@ shinyUI(fluidPage(
                selectInput(
                  "alk_type", label = "Age-length key:",
                  choices = c("Raw", "Iterated"),
-                 selected = "Iterated", width = "150px"
+                 selected = "Iterated", width = "125px"
                ),
                # growth model option
                selectInput(
                  "growth_model", label = "Growth model:",
                  choices = gm_choices,
-                 selected = "", width = "200px"
+                 selected = "", width = "175px"
                )
         ) # end column
       ), # end fluidRow
       
       fluidRow(
-        column(width = 3,
+        column(width = 12,
                # formula fit number option
                selectInput(
                  "fit_formula", label = "Model fit:",
@@ -69,7 +69,7 @@ shinyUI(fluidPage(
       ),# end fluidRow
       
       fluidRow(
-        column(width = 4,
+        column(width = 6,
                # catch
                selectInput(
                  "catch", label = "Catch data:",
@@ -86,7 +86,7 @@ shinyUI(fluidPage(
       ), # end fluidRow
       
       fluidRow(
-        column(width = 4,
+        column(width = 12,
                # sturgeon total length
                sliderInput(
                  "minlen", label = "Minimum length (cm TL):",
@@ -101,7 +101,7 @@ shinyUI(fluidPage(
       ), # end fluidRow
       
       fluidRow(
-        column(width = 4,
+        column(width = 12,
                checkboxGroupInput(
                  inputId = "years",
                  label = "Years:",
@@ -119,6 +119,9 @@ shinyUI(fluidPage(
         tabPanel("Plot", plotOutput("plot")), 
         tabPanel("Summary", verbatimTextOutput("summ")), 
         #tabPanel("Table", tableOutput("table")),
+				tabPanel("More Plots", 
+									h3("Estimated Catch by Brood Year and Age", align = "center"),
+									uiOutput("plots_nByBroodYear")),
         selected = "Plot"
       ) # end tabsetPanel
       
