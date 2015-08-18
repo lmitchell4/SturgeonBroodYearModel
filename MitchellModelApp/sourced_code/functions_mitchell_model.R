@@ -52,6 +52,10 @@ GetAgeAssign <- function(args_list, fit_form_opt, wyi = Sac_H20_Index,
     plotBool = show_plots # FALSE
   )
   
+	for(nm in names(fit_exp)) {
+		results[[nm]] <- fit_exp[[nm]]
+	}
+	
   # display plots if desired *****************************************
   if (show_plots) {
     
@@ -92,7 +96,10 @@ GetAgeAssign <- function(args_list, fit_form_opt, wyi = Sac_H20_Index,
   # function output
   # TBD
   #results
-  fit_exp
+  #fit_exp
+		
+	return( results )
+	
 }
 # end GetAgeAssign
 
@@ -523,4 +530,82 @@ GetModelStartingData <- function(catch_col = c("Catch", "AdjCatch"),
   )
 }
 # end GetModelStartingData
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+plotByBroodYear <- function(modelResult, nr, nc) {
+	# Creates plots of the estimated number caught by brood year and age. 
+	# Each brood year is represented in a separate plot within a grid with nr rows
+	# 	and nc columns. When the grid is full, a new device is opened.
+	# 
+  # Args:
+	#   modelResult: a list returned by the function ageAssignResults().
+  #   nr: Number of rows in the plot grid.
+	#		nc: Number of columns in the plot grid.
+  #
+  # Returns:
+  #  
+
+	nBYxAgeLong <- modelResult[["nBYxAgeLong"]]
+	selectSource <- modelResult[["lenDataSource"]]
+	year.brood <- modelResult[["year.brood"]]
+	nYearBrood <- length(year.brood)	
+	
+
+	ppp <- nr*nc	# plots per page
+
+	numPage <- ceiling(nYearBrood/ppp)
+	yearToPage <- rep(1:numPage, each=ppp)[1:nYearBrood]
+	names(yearToPage) <- as.character(year.brood)
+	nBYxAgeLong$plotPage <- yearToPage[as.character(nBYxAgeLong$BroodYear)]
+
+	plots <- list()
+	for(i in 1:numPage) {
+		xmin <- min(nBYxAgeLong$Age)
+		xmax <- max(nBYxAgeLong$Age)
+		
+		xsub <- subset(nBYxAgeLong, plotPage==i & !is.na(Number))	# to prevent ggplot warnings	
+		xsub$BroodYear <- paste("Brood Year",xsub$BroodYear)
+		
+		## If there are fewer than ppp plots, add blank plots:
+		n <- length(unique(xsub$BroodYear))
+		if(n < ppp) {
+			tmp <- sapply(1:(ppp - n), function(y) paste(rep(" ",y),collapse=""))
+			useLevels <- c(sort(unique(xsub$BroodYear)), tmp)
+			xsub$BroodYear <- factor(xsub$BroodYear, levels=useLevels, ordered=TRUE)
+		}
+		
+		mygg <- ggplot(xsub, aes(x=Age, y=Number)) + geom_point() +
+							xlim(xmin, xmax) + ylab("Number of Fish") + 
+							theme(text = element_text(size = 15)) 
+							#+ 
+							#ggtitle(paste("Estimated Catch by Brood Year and Age\n","Source:",selectSource))	
+							
+		if(max(xsub$Number) == 0) {
+			mygg <- mygg + ylim(0,1) + facet_wrap( ~ BroodYear, nrow=nr, ncol=nc, scales="free_y", drop=FALSE) 
+		} else {
+			mygg <- mygg + facet_wrap( ~ BroodYear, nrow=nr, ncol=nc, scales="free_y", drop=TRUE) 
+		}
+
+		plots[[i]] <- mygg
+		#dev.new(width=11, height=6, units="inch")
+		#print(mygg)
+	}
+
+	return(plots)
+}															
+
+
 

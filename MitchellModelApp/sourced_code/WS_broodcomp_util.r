@@ -273,12 +273,12 @@ kimura_chikuni_custom <- function(x, fi2, threshold = 1e-04, maxiter = 20000,
 
 
 ageAssignResults <- function(lenDataSource, lengthBinVec, ageBinVec, alkType,
-                             growthModelType="") {
+                             growthModelType="None") {
   ## Options for inputs:
   ##   lenDataSource: "Tagging", "Card", or "Both"
   ##   alkType: "Raw" or "Iterated"
   ##   growthModelType: "VB.Normal", "VB.LogNormal", "Gompertz.Normal", 
-  ##                    "Gompertz.LogNormal", or ""
+  ##                    "Gompertz.LogNormal", or "None"
   ## 
   ## lengthBinVec and ageBinVec have the structure:
   ##              c(min, practicalMax, absoluteMax, stepSize)
@@ -291,7 +291,7 @@ ageAssignResults <- function(lenDataSource, lengthBinVec, ageBinVec, alkType,
   # For debugging:
 #  lenDataSource <- "Tagging"; lengthBinVec=c(20,160,300,5); ageBinVec <- c(0,40,70,1)
 
-#  alkType <- "Iterated"; growthModelType <- ""
+#  alkType <- "Iterated"; growthModelType <- "None"
     
   # ****************************************************************************
   # changed below so lenDataSource input would accommodate more than the 3
@@ -316,7 +316,7 @@ ageAssignResults <- function(lenDataSource, lengthBinVec, ageBinVec, alkType,
     stop("alkType argument must be 'Raw' or 'Iterated'", call. = FALSE)
   }
   
-  validGM <- c("VB.Normal","VB.LogNormal","Gompertz.Normal","Gompertz.LogNormal","")
+  validGM <- c("VB.Normal","VB.LogNormal","Gompertz.Normal","Gompertz.LogNormal","None")
   if(alkType=="Iterated" & !growthModelType %in% validGM)  {
     cat("Invalid growthModelType. See the function ageAssignResults().\n")
     return(NULL)              
@@ -487,7 +487,7 @@ ageAssignResults <- function(lenDataSource, lengthBinVec, ageBinVec, alkType,
   
   } else if(alkType == "Iterated") {
   
-    if(growthModelType != "") {
+    if(growthModelType != "None") {
       # Fit growthmodel:
       myFit <- fit.GM(growthModelType, plotBool=FALSE) 
       
@@ -501,7 +501,7 @@ ageAssignResults <- function(lenDataSource, lengthBinVec, ageBinVec, alkType,
         invalk[i, ] <- InvALK.fcn(myFit, lengthVec[i], ageVec, alk_lookup)
       }
       
-    } else if(growthModelType == "") {
+    } else if(growthModelType == "None") {
       # Construct inverse ALK from the age-length data directly. There will be holes!
       invalk <- matrix(0, nrow=nLength, ncol=nAge, dimnames=list(lengthClass,ageClass))
       for(L.char in rownames(agelenBinned)) {
@@ -618,13 +618,13 @@ ageAssignResults <- function(lenDataSource, lengthBinVec, ageBinVec, alkType,
                     "nBYxAgeWide"=nBYxAgeWide, 
                     "nBYxAgeLong"=nBYxAgeLong)
                   
-  if(alkType == "Iterated" & growthModelType != "") {
+  if(alkType == "Iterated" & growthModelType != "None") {
     returnList[["gmFit"]] <- myFit
     returnList[["alk_lookup"]] <- alk_lookup
     returnList[["invalk"]] <- invalk
   }
   
-  if(alkType == "Iterated" & growthModelType == "") {
+  if(alkType == "Iterated" & growthModelType == "None") {
     returnList[["invalk"]] <- invalk
   }
   
@@ -861,9 +861,6 @@ myPlot <- function(x, y, ..., Height, Width, devNew=FALSE) {
 
 
 
-
-
-
 #vb <- function(Linf, K, t0, Age) Linf*(1-exp(-K*(Age-t0)))
 #
 #gmFormula <- ForkLength ~ Linf*(1-exp(-K*(Age-t0)))
@@ -876,5 +873,8 @@ myPlot <- function(x, y, ..., Height, Width, devNew=FALSE) {
 #fit[["modelName"]] <- "Custom"
 #fit[["modelError"]] <- "Normal"
 #  
+
+
+
 
 
