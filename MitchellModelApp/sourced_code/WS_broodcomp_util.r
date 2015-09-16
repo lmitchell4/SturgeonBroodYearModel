@@ -594,6 +594,11 @@ ageAssignResults <- function(lenDataSource, lengthBinVec, ageBinVec, alkType,
     nBYxAgeLong[i,"Number"] <- nBYxAgeWide[broodyr.char,age.char]
   } 
 
+	## Add annual effort data to nBYxAgeLong (using nfhData globally):
+	nBYxAgeLong$CatchYear <- with(nBYxAgeLong, BroodYear + Age)
+	nBYxAgeLong$AnnualEffort <- nfhData[as.character(nBYxAgeLong$CatchYear),"NFH"]
+
+	
 ######################
 ######################
 
@@ -661,14 +666,14 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
   ##            one pi for all brood years.
   ##  5 = Poisson; separate N0S0 for each brood year; one lambda.
   ##  6 = ZIP; separate N0S0 for each brood year, one lambda; one pi.
-  
+  ##  7 = ZIP with effort offset.
   
   # Round the number-at-age to the nearest integer and create
   # a column with BroodYear as a factor:  
   nBYxAgeLong <- resultObject[["nBYxAgeLong"]]
   nBYxAgeLong$Num.int <- round(nBYxAgeLong$Number)
   nBYxAgeLong$BY.factor <- as.factor(nBYxAgeLong$BroodYear)
-  
+  	
   # J. DuBois added (08-Jul-2015) because line 727:
   # barplot(round(t(nBYxAgeWide[by.char, ])) would not work without myResults
   # being run (from _run.r)
@@ -725,8 +730,22 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
   
     ## Zero-inflated Poisson.
     ## Num.int_{BY} = N0S0_{BY} * exp(-lambda*Age)
-    ## One pi for all brood years.   
+    ## One pi for all brood years. 
+
     use.fmla <- as.formula(Num.int ~ BY.factor + Age | 1)
+    use.fit <- zeroinfl(use.fmla, dist="poisson", data=nBYxAgeLong_sub,
+                        na.action = na.omit)  
+      
+  } else if(formulaOpt == 7) {
+  
+		## Zero-inflated Poisson with Effort:
+		## 	C = q*E*N = catchability * Effort * Abundance
+		##  Num.int_{BY} = qN0S0_{BY} * exp(-lambda*Age)
+		##  
+    ## One pi for all brood years.
+		## Constant q that gets rolled into N0S0.
+		
+    use.fmla <- as.formula(Num.int ~ BY.factor + Age + offset(log(AnnualEffort)) | 1)
     use.fit <- zeroinfl(use.fmla, dist="poisson", data=nBYxAgeLong_sub,
                         na.action = na.omit)  
       
@@ -734,7 +753,7 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
 
 
   # Separate N0S0 for each brood year:
-  if(formulaOpt %in% c(1,3,4,5,6)) {
+  if(formulaOpt %in% c(1,3,4,5,6,7)) {
     # Unique, sorted being used to fit the model:
     uniq.by.char <- unique(as.character(nBYxAgeLong_sub$BroodYear)) 
          
@@ -812,7 +831,7 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
   use.fit[["aic"]] <- AIC(use.fit)         
   use.fit[["N0S0"]] <- N0S0
   use.fit[["lambda"]] <- lambda
-      
+ 
   # J. DuBois added 28-Jul-2015 for more control over output
   if (display_vals) {
     # Display values:      
