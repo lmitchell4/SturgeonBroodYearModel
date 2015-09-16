@@ -126,10 +126,14 @@ shinyServer(function(input, output) {
 	})
 
   output$plots_nByBroodYear <- renderUI({
-    lapply(1:plotByBroodYear_results()$n, function(i) {
+    # do.call(tagList,
+			lapply(1:plotByBroodYear_results()$n, function(i) {
 				renderPlot({
 					plotByBroodYear_results()$plots[[i]]
-				})			
+				})
+				
+		# )
+		
     })
   })	
 	
