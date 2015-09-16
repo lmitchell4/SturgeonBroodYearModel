@@ -59,46 +59,31 @@ rm(source_dir, millar_files, local_bool)
 
 # Select model input ---------------------------------------------------
 
-gm_choices <- c("None", "VB.Normal", "VB.LogNormal",
-                "Gompertz.Normal", "Gompertz.LogNormal")
-
-data_choices <- c("Tagging", "Card")#, "Both",
-                  #"TagApp", "CardApp", "BothApp")
-
-# create variable to hold names of Millar models for gear selectivity
-millar_mod_choices <- c("norm.loc", "norm.sca", "lognorm",
-                        "binorm.sca", "bilognorm")
-
-tagging_years <- c(1990, 1991, 1993, 1994, 1997, 1998,
-                   2001, 2002, 2005, 2006, 2007, 2008,
-                   2009, 2010, 2011, 2012, 2013, 2014)
-
 # establish tagging dataframe using input from user-interface
-#  catch_col: c("Catch", "AdjCatch")
-#  millar_model: c("norm.loc", "norm.sca", "lognorm",
-#                        "binorm.sca", "bilognorm")
-#  min_len:
-#  
 taggingData <- GetStuTagGearSelData(
-	catch_col = "AdjCatch", millar_model = "bilognorm",
-	min_len = 40, l_mit_rows = TRUE
+	catch_col = "AdjCatch",				# c("Catch", "AdjCatch")
+	millar_model = "bilognorm",		# c("norm.loc", "norm.sca", "lognorm", "binorm.sca", "bilognorm")
+	min_len = 40, 
+	l_mit_rows = TRUE
 )
 
 
 # establish card dataframe using input from user-interface
 card_data <- GetStuCardLFData(
-		card_data = dfCardDataAll, legit_len = 20,
-		species = "White", l_mit_rows = TRUE)
+		card_data = dfCardDataAll, 
+		legit_len = 20,
+		species = "White", 
+		l_mit_rows = TRUE
+)
 
 
-agrument_list <- list(
+args_list <- list(
 	lenDataSource = "Tagging",					# c("Tagging", "Card")
 	lengthBinVec = c(0, 300, 310, 5),
 	ageBinVec = c(0, 50, 70, 1),
 	alkType = "Iterated",				# c("Raw", "Iterated")
 	growthModelType = "None"		# c("None", "VB.Normal", "VB.LogNormal", "Gompertz.Normal", "Gompertz.LogNormal")
 )
-
 
 
 results <- ageAssignResults(
@@ -113,30 +98,25 @@ results <- ageAssignResults(
 fit_exp <- fitExpModel(
 	resultObject = results, 
 	bySubsetVec = c(1970:2013),
-	formulaOpt = 6, 
+	formulaOpt = 7, 
 	usedevnew = FALSE,
 	plotBool = FALSE
 )
 
 
+dev.new()
+PlotN0S0(fit_exp$N0S0)
 
 
 
 
+# results <- GetAgeAssign(
+	# args_list = agrument_list,
+	# fit_form_opt = 4,
+	# show_plots = FALSE
+# )
 
-	
-#taggingData <- subset(x = tagging_data, subset = Year %in% input$years)
-#cardData <- card_data()
-
-results <- GetAgeAssign(
-	args_list = agrument_list,
-	fit_form_opt = 4,
-	show_plots = FALSE
-)
-
-PlotN0S0(results$N0S0)
-
-# plotByBroodYear(results,3,3)		# nr and nc could be inputs; leave constant for now
+# PlotN0S0(results$N0S0)
 
 
 
