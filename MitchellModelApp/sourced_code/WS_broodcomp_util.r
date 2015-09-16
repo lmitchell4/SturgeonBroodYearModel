@@ -95,12 +95,12 @@ fit.GM <- function(growthModelType, plotBool=FALSE, newDev=TRUE) {
     ## Gompertz, Multiplicative errors:
     gmFormula <- ln_ForkLength ~ log( Linf*exp(alpha*exp(beta*Age)) )
     init <- list(Linf = 225, alpha = -1.5, beta = -0.15)
-       
+
   }
 
   modelName <- strsplit(growthModelType, split=".", fixed=TRUE)[[1]][1]
   modelError <- strsplit(growthModelType, split=".", fixed=TRUE)[[1]][2]
-       
+
   fit <- nls(gmFormula, data=agelenData, start=init)
   fit[["growthModelType"]] <- growthModelType
   fit[["modelName"]] <- modelName
@@ -596,7 +596,7 @@ ageAssignResults <- function(lenDataSource, lengthBinVec, ageBinVec, alkType,
 
 ######################
 ######################
-                 
+
   ## Return lots of things.
   returnList <- list("lenDataSource"=data_source,#lenDataSource, 
                     "lengthBinVec"=lengthBinVec,
