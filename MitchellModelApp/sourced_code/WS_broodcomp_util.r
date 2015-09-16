@@ -681,7 +681,7 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
   if(formulaOpt == 1) {
 
     ## NB.
-    ## Num.int_{BY} = N0S0_{BY} * exp(-Age*t)
+    ## Num.int_{BY} = N0S0_{BY} * exp(-lambda*Age)
     use.fmla <- as.formula(Num.int ~ BY.factor + Age)
     use.fit <- glm.nb(as.formula(use.fmla), data=nBYxAgeLong_sub,
                         na.action = na.omit) 
@@ -690,7 +690,7 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
   } else if(formulaOpt == 2) {
 
     ## NB.
-    ## Num.int_{BY} = N0S0 * exp(-Age*t)  
+    ## Num.int_{BY} = N0S0 * exp(-lambda*Age)  
     use.fmla <- as.formula(Num.int ~ Age)
     use.fit <- glm.nb(as.formula(use.fmla), data=nBYxAgeLong_sub,
                         na.action = na.omit)
@@ -698,7 +698,7 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
   } else if(formulaOpt == 3) {
   
     ## Zero-inflated NB.
-    ## Num.int_{BY} = N0S0_{BY} * exp(-Age*t)
+    ## Num.int_{BY} = N0S0_{BY} * exp(-lambda*Age)
     ## Separate pi for each brood year.    
     use.fmla <- as.formula(Num.int ~ BY.factor + Age | BY.factor)
     use.fit <- zeroinfl(use.fmla, dist="negbin", data=nBYxAgeLong_sub,
@@ -707,7 +707,7 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
   } else if(formulaOpt == 4) {
 
     ## Zero-inflated NB.
-    ## Num.int_{BY} = N0S0_{BY} * exp(-Age*t)
+    ## Num.int_{BY} = N0S0_{BY} * exp(-lambda*Age)
     ## One pi for all brood years.   
     use.fmla <- as.formula(Num.int ~ BY.factor + Age | 1)
     use.fit <- zeroinfl(use.fmla, dist="negbin", data=nBYxAgeLong_sub,
@@ -716,7 +716,7 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
   } else if(formulaOpt == 5) {
   
     ## Poisson.
-    ## Num.int_{BY} = N0S0_{BY} * exp(-Age*t)
+    ## Num.int_{BY} = N0S0_{BY} * exp(-lambda*Age)
     use.fmla <- as.formula(Num.int ~ BY.factor + Age)
     use.fit <- glm(as.formula(use.fmla), data=nBYxAgeLong_sub, family=poisson(),
                         na.action = na.omit) 
@@ -724,7 +724,7 @@ fitExpModel <- function(resultObject, bySubsetVec, formulaOpt, plotBool=TRUE,
   } else if(formulaOpt == 6) {
   
     ## Zero-inflated Poisson.
-    ## Num.int_{BY} = N0S0_{BY} * exp(-Age*t)
+    ## Num.int_{BY} = N0S0_{BY} * exp(-lambda*Age)
     ## One pi for all brood years.   
     use.fmla <- as.formula(Num.int ~ BY.factor + Age | 1)
     use.fit <- zeroinfl(use.fmla, dist="poisson", data=nBYxAgeLong_sub,
