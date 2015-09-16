@@ -105,6 +105,19 @@ if(exists("BayStudyOtterTrawlKey")) {
 agelenData <- agelenData[with(agelenData, order(Age,ForkLength,Year)), ]
 
 
+
+
+###### Net Fathom Hour Effort Data:
+nfhData <- read.csv("data/Sturgeon_AnnualEffortData.csv", header=TRUE,
+										stringsAsFactors=FALSE)
+row.names(nfhData) <- nfhData$Year
+
+
+
+
+
+
+
 ####### Water Year Index:
 # Loads: Sac_H20_Index
 #        SJ_H20_Index
