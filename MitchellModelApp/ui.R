@@ -56,7 +56,7 @@ shinyUI(fluidPage(
                # formula fit number option
                selectInput(
                  "fit_formula", label = "Model fit:",
-                 choices = c(1:6),
+                 choices = c(1:7),
                  selected = 4, width = "90px"
                ),
                # plotting option
